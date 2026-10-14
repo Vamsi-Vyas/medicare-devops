@@ -107,22 +107,31 @@ pipeline {
             }
         }
 
-        stage('Switch Traffic') {
-            steps {
-                sh '''
-                    set -eu
-                    export KUBECONFIG=/var/lib/jenkins/.kube/config
 
-                    kubectl patch service medicare-service \
-                        --type=merge \
-                        -p "{\"spec\":{\"selector\":{\"app\":\"medicare\",\"version\":\"${DEPLOY_VERSION}\"}}}"
+stage('Switch Traffic') {
+    steps {
+        sh '''
+            set -eu
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
 
-                    kubectl get service medicare-service
-                '''
+            case "$DEPLOY_VERSION" in
+              blue|green) ;;
+              *) echo "Invalid deployment version"; exit 1 ;;
+            esac
 
-                echo "Traffic switched to ${params.DEPLOY_VERSION}"
-            }
-        }
+            PATCH="{\\"spec\\":{\\"selector\\":{\\"app\\":\\"medicare\\",\\"version\\":\\"${DEPLOY_VERSION}\\"}}}"
+
+            echo "Switching traffic to ${DEPLOY_VERSION}"
+            kubectl patch service medicare-service \
+              --type=merge \
+              -p "$PATCH"
+
+            kubectl get service medicare-service \
+              -o jsonpath='{.spec.selector}'
+            echo
+        '''
+    }
+}
 
         stage('Verify Served Version') {
             steps {
