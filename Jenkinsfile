@@ -39,7 +39,6 @@ pipeline {
                         fi
                         sleep 2
                     done
-                    echo 'Smoke test failed'
                     exit 1
                 '''
             }
@@ -51,7 +50,7 @@ pipeline {
             echo 'CI pipeline completed successfully'
         }
         failure {
-            echo 'CI pipeline failed. Check the console output.'
+            echo 'CI pipeline failed. Check Console Output.'
         }
     }
 }
