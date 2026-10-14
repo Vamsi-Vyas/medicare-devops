@@ -6,7 +6,7 @@ pipeline {
         choice(
             name: 'DEPLOY_VERSION',
             choices: ['blue', 'green'],
-            description: 'Choose the version to serve'
+            description: 'Select the version to serve'
         )
     }
 
@@ -20,9 +20,12 @@ pipeline {
 
         stage('Validate Application') {
             steps {
-                sh 'test -s app/index.html'
-                sh 'grep -q "MediCare" app/index.html'
-                echo 'Application validation passed'
+                sh '''
+                    set -eu
+                    test -s app/index.html
+                    grep -q "MediCare" app/index.html
+                    echo "Application validation passed"
+                '''
             }
         }
 
@@ -69,15 +72,15 @@ pipeline {
                     trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
 
                     for i in $(seq 1 20); do
-                        if curl -fsS http://127.0.0.1:$PORT/ \
+                        if curl -fsS "http://127.0.0.1:$PORT/" \
                             | grep -q 'MediCare'; then
-                            echo 'Smoke test passed'
+                            echo "Smoke test passed"
                             exit 0
                         fi
                         sleep 2
                     done
 
-                    echo 'Smoke test failed'
+                    echo "Smoke test failed"
                     exit 1
                 '''
             }
@@ -89,8 +92,16 @@ pipeline {
                     set -eu
                     export KUBECONFIG=/var/lib/jenkins/.kube/config
 
+                    case "$DEPLOY_VERSION" in
+                        blue|green) ;;
+                        *)
+                            echo "Invalid DEPLOY_VERSION: $DEPLOY_VERSION"
+                            exit 1
+                            ;;
+                    esac
+
                     kubectl rollout status \
-                        deployment/medicare-${DEPLOY_VERSION} \
+                        "deployment/medicare-${DEPLOY_VERSION}" \
                         --timeout=120s
                 '''
             }
@@ -103,7 +114,8 @@ pipeline {
                     export KUBECONFIG=/var/lib/jenkins/.kube/config
 
                     kubectl patch service medicare-service \
-                        -p '{"spec":{"selector":{"app":"medicare","version":"'${DEPLOY_VERSION}'"}}}'
+                        --type=merge \
+                        -p "{\"spec\":{\"selector\":{\"app\":\"medicare\",\"version\":\"${DEPLOY_VERSION}\"}}}"
 
                     kubectl get service medicare-service
                 '''
@@ -111,16 +123,45 @@ pipeline {
                 echo "Traffic switched to ${params.DEPLOY_VERSION}"
             }
         }
+
+        stage('Verify Served Version') {
+            steps {
+                sh '''
+                    set -eu
+                    export KUBECONFIG=/var/lib/jenkins/.kube/config
+
+                    kubectl rollout status deployment/medicare-${DEPLOY_VERSION} \
+                        --timeout=120s
+
+                    kubectl port-forward service/medicare-service \
+                        18082:80 >/tmp/medicare-port-forward.log 2>&1 &
+                    PF_PID=$!
+                    trap 'kill "$PF_PID" 2>/dev/null || true' EXIT
+
+                    for i in $(seq 1 15); do
+                        if curl -fsS http://127.0.0.1:18082/ \
+                            -o /tmp/medicare-served.html; then
+                            break
+                        fi
+                        sleep 2
+                    done
+
+                    grep -q "id=\\"version\\">${DEPLOY_VERSION^}<" \
+                        /tmp/medicare-served.html
+
+                    echo "Verified served version: ${DEPLOY_VERSION}"
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'Pipeline, security checks, smoke test, and traffic switch succeeded'
+            echo 'Pipeline and Blue-Green traffic switch succeeded'
         }
 
         failure {
-            echo 'Pipeline failed. Check Console Output for the failed stage.'
+            echo 'Pipeline failed. Review Console Output for the failed stage.'
         }
     }
 }
-
