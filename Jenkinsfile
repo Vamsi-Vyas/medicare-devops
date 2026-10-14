@@ -52,11 +52,7 @@ pipeline {
                     NAME=medicare-test-${BUILD_NUMBER}
                     PORT=18081
 
-                    docker rm -f "$NAME" >/dev/null 2>&1 || true
-                    docker run -d --name "$NAME" \
-                        -p 127.0.0.1:$PORT:80 \
-                        medicare-devops:${BUILD_NUMBER}
-
+docker run -d --name "$NAME" -p 127.0.0.1:$PORT:8080 medicare-devops:${BUILD_NUMBER}
                     trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
 
                     for i in $(seq 1 20); do
