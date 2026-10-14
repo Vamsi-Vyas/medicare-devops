@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -17,6 +18,27 @@ pipeline {
             }
         }
 
+        stage('Security Scan - Application') {
+            steps {
+                sh '''
+                    set -eu
+                    trivy fs --scanners vuln,secret \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 .
+                '''
+            }
+        }
+
+        stage('Security Scan - Dockerfile') {
+            steps {
+                sh '''
+                    set -eu
+                    trivy config --severity HIGH,CRITICAL \
+                        --exit-code 1 Dockerfile
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t medicare-devops:${BUILD_NUMBER} .'
@@ -29,16 +51,23 @@ pipeline {
                     set -eu
                     NAME=medicare-test-${BUILD_NUMBER}
                     PORT=18081
+
                     docker rm -f "$NAME" >/dev/null 2>&1 || true
-                    docker run -d --name "$NAME" -p 127.0.0.1:$PORT:80 medicare-devops:${BUILD_NUMBER}
+                    docker run -d --name "$NAME" \
+                        -p 127.0.0.1:$PORT:80 \
+                        medicare-devops:${BUILD_NUMBER}
+
                     trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
+
                     for i in $(seq 1 20); do
-                        if curl -fsS http://127.0.0.1:$PORT/ | grep -q 'MediCare'; then
+                        if curl -fsS http://127.0.0.1:$PORT/ \
+                            | grep -q 'MediCare'; then
                             echo 'Smoke test passed'
                             exit 0
                         fi
                         sleep 2
                     done
+
                     exit 1
                 '''
             }
@@ -47,10 +76,10 @@ pipeline {
 
     post {
         success {
-            echo 'CI pipeline completed successfully'
+            echo 'CI/CD and security checks completed successfully'
         }
         failure {
-            echo 'CI pipeline failed. Check Console Output.'
+            echo 'Pipeline failed. Check Console Output for the failed stage.'
         }
     }
 }
