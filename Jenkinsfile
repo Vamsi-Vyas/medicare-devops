@@ -2,6 +2,14 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'DEPLOY_VERSION',
+            choices: ['blue', 'green'],
+            description: 'Choose the version to serve'
+        )
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -52,7 +60,11 @@ pipeline {
                     NAME=medicare-test-${BUILD_NUMBER}
                     PORT=18081
 
-docker run -d --name "$NAME" -p 127.0.0.1:$PORT:8080 medicare-devops:${BUILD_NUMBER}
+                    docker rm -f "$NAME" >/dev/null 2>&1 || true
+                    docker run -d --name "$NAME" \
+                        -p 127.0.0.1:$PORT:8080 \
+                        medicare-devops:${BUILD_NUMBER}
+
                     trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
 
                     for i in $(seq 1 20); do
@@ -63,16 +75,37 @@ docker run -d --name "$NAME" -p 127.0.0.1:$PORT:8080 medicare-devops:${BUILD_NUM
                         fi
                         sleep 2
                     done
-
                     exit 1
                 '''
             }
         }
-    }
 
+stage('Verify Kubernetes') {
+    steps {
+        sh '''
+            set -eu
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
+            kubectl rollout status \
+                deployment/medicare-${DEPLOY_VERSION} \
+                --timeout=120s
+        '''
+    }
+}
+stage('Switch Traffic') {
+    steps {
+        sh '''
+            set -eu
+            export KUBECONFIG=/var/lib/jenkins/.kube/config
+            kubectl patch service medicare-service \
+                -p '{"spec":{"selector":{"app":"medicare","version":"'${DEPLOY_VERSION}'"}}}'
+            kubectl get service medicare-service
+        '''
+        echo "Traffic switched to ${params.DEPLOY_VERSION}"
+    }
+}
     post {
         success {
-            echo 'CI/CD and security checks completed successfully'
+            echo 'Pipeline, security checks, smoke test, and traffic switch succeeded'
         }
         failure {
             echo 'Pipeline failed. Check Console Output for the failed stage.'
