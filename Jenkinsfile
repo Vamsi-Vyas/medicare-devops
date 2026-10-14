@@ -61,6 +61,7 @@ pipeline {
                     PORT=18081
 
                     docker rm -f "$NAME" >/dev/null 2>&1 || true
+
                     docker run -d --name "$NAME" \
                         -p 127.0.0.1:$PORT:8080 \
                         medicare-devops:${BUILD_NUMBER}
@@ -75,40 +76,51 @@ pipeline {
                         fi
                         sleep 2
                     done
+
+                    echo 'Smoke test failed'
                     exit 1
                 '''
             }
         }
 
-stage('Verify Kubernetes') {
-    steps {
-        sh '''
-            set -eu
-            export KUBECONFIG=/var/lib/jenkins/.kube/config
-            kubectl rollout status \
-                deployment/medicare-${DEPLOY_VERSION} \
-                --timeout=120s
-        '''
+        stage('Verify Kubernetes') {
+            steps {
+                sh '''
+                    set -eu
+                    export KUBECONFIG=/var/lib/jenkins/.kube/config
+
+                    kubectl rollout status \
+                        deployment/medicare-${DEPLOY_VERSION} \
+                        --timeout=120s
+                '''
+            }
+        }
+
+        stage('Switch Traffic') {
+            steps {
+                sh '''
+                    set -eu
+                    export KUBECONFIG=/var/lib/jenkins/.kube/config
+
+                    kubectl patch service medicare-service \
+                        -p '{"spec":{"selector":{"app":"medicare","version":"'${DEPLOY_VERSION}'"}}}'
+
+                    kubectl get service medicare-service
+                '''
+
+                echo "Traffic switched to ${params.DEPLOY_VERSION}"
+            }
+        }
     }
-}
-stage('Switch Traffic') {
-    steps {
-        sh '''
-            set -eu
-            export KUBECONFIG=/var/lib/jenkins/.kube/config
-            kubectl patch service medicare-service \
-                -p '{"spec":{"selector":{"app":"medicare","version":"'${DEPLOY_VERSION}'"}}}'
-            kubectl get service medicare-service
-        '''
-        echo "Traffic switched to ${params.DEPLOY_VERSION}"
-    }
-}
+
     post {
         success {
             echo 'Pipeline, security checks, smoke test, and traffic switch succeeded'
         }
+
         failure {
             echo 'Pipeline failed. Check Console Output for the failed stage.'
         }
     }
 }
+
