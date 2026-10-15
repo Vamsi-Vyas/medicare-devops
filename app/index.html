@@ -1,35 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MediCare Dashboard</title>
-  <style>
-    body { font-family: Arial; margin: 0; background: #f1f5f9; color: #1e293b; }
-    header { background: #0f766e; color: white; padding: 24px; }
-    main { max-width: 800px; margin: 30px auto; padding: 20px; }
-    section { background: white; padding: 22px; margin: 16px 0; border-radius: 12px; }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="MediCare community clinic demo website for healthcare services and appointment enquiries.">
+<title>MediCare | Care that puts you first</title>
+<style>
+:root{--ink:#123047;--teal:#087f8c;--mint:#dff7f1;--paper:#f6fafb;--muted:#5d7280;--line:#dce8ec;--white:#fff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial;color:var(--ink);background:var(--paper)}
+a{color:inherit;text-decoration:none}.wrap{width:min(1120px,92%);margin:auto}.top{background:#103a4a;color:#e8f9fa;font-size:13px;padding:8px 0}.top .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+nav{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.navin{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:76px}.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:850;letter-spacing:-.6px}.logo{display:grid;place-items:center;width:40px;height:40px;background:var(--teal);color:white;border-radius:13px;font-size:24px}.brand span{color:var(--teal)}.links{display:flex;align-items:center;gap:25px;color:#405a69;font-size:14px;font-weight:650}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:var(--teal);color:white;padding:12px 18px;font-weight:750;cursor:pointer}.btn.secondary{background:white;color:var(--teal);border:1px solid #b7dfe0}.hero{padding:68px 0 54px;background:radial-gradient(circle at 82% 25%,#c6f0e6 0,transparent 30%),linear-gradient(115deg,#f5fbfb,#e9f8f5)}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:48px}.eyebrow{display:inline-block;color:var(--teal);background:#dff7f1;padding:6px 12px;border-radius:999px;font-size:12px;letter-spacing:1px;font-weight:850;text-transform:uppercase}.hero h1{font-size:clamp(38px,5vw,62px);line-height:1.07;letter-spacing:-2.4px;margin:18px 0}.hero h1 em{font-style:normal;color:var(--teal)}.hero p{font-size:18px;color:var(--muted);max-width:540px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:25px 0}.note{font-size:12px!important}.visual{position:relative;min-height:360px;border-radius:28px;background:linear-gradient(145deg,#b7e8df,#e6f7f2);display:grid;place-items:center;overflow:hidden}.circle{width:240px;height:240px;border-radius:50%;background:#fff9;display:grid;place-items:center;font-size:130px;box-shadow:0 20px 70px #1d6c7130}.float{position:absolute;background:white;padding:14px 18px;border-radius:14px;box-shadow:0 12px 35px #143c4b18;font-size:13px;font-weight:750}.f1{top:30px;left:22px}.f2{bottom:26px;right:20px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}.stat{font-size:13px;color:var(--muted)}.stat strong{display:block;font-size:20px;color:var(--ink)}
+section.content{padding:70px 0}.heading{text-align:center;max-width:650px;margin:0 auto 32px}.heading h2{font-size:clamp(28px,3vw,40px);line-height:1.15;margin:10px 0}.heading p{color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:24px}.ico{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:var(--mint);font-size:24px}.card h3{margin:15px 0 6px}.card p{color:var(--muted);font-size:14px}.card a{color:var(--teal);font-weight:750;font-size:14px}.about{background:#fff}.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:55px;align-items:center}.about-art{background:#e4f5f1;min-height:310px;border-radius:24px;display:grid;place-items:center;font-size:100px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.checks div{font-weight:700;font-size:14px}.checks div:before{content:'✓';color:var(--teal);font-weight:900;margin-right:8px}.appointment{background:#103a4a;color:white}.appointment .heading p{color:#c3dbe0}.formbox{max-width:760px;margin:auto;background:#fff;color:var(--ink);border-radius:18px;padding:26px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;font:inherit;font-size:14px;padding:12px;border:1px solid var(--line);border-radius:9px;background:#fbfdfd}.field.full{grid-column:1/-1}.formhint{font-size:12px;color:var(--muted)}.hours{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.hour{background:white;padding:22px;border:1px solid var(--line);border-radius:14px}.hour strong{display:block;margin-bottom:5px}.hour span{color:var(--muted);font-size:14px}footer{background:#092a38;color:#d3e7eb;padding:28px 0;font-size:13px}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.version{position:fixed;bottom:10px;right:10px;background:#103a4a;color:#d9f8ef;border:1px solid #477b82;padding:5px 9px;border-radius:7px;font:11px ui-monospace,monospace;opacity:.9}
+@media(max-width:800px){.links{gap:12px}.links a:not(.btn){display:none}.hero-grid,.about-grid{grid-template-columns:1fr}.hero{padding:45px 0}.visual{min-height:290px}.cards{grid-template-columns:1fr 1fr}.stats{gap:8px}.checks{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.cards,.hours,.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero h1{letter-spacing:-1.3px}.circle{width:190px;height:190px;font-size:100px}.stats{grid-template-columns:1fr 1fr}.formbox{padding:18px}.navin{min-height:64px}.brand{font-size:19px}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>MediCare Healthcare Dashboard</h1>
-    <p>DevOps Mini-Project</p>
-  </header>
-  <main>
-    <section>
-      <h2>Welcome</h2>
-      <p>Sample healthcare appointment dashboard.</p>
-      <p>Status: Healthy</p>
-    </section>
-    <section>
-      <h2>Appointment Services</h2>
-      <p>General consultation — demo only</p>
-    </section>
-    <section>
-      <h2>Deployment Version</h2>
-      <p id="version">Blue</p>
-    </section>
-  </main>
-</body>
-</html>
+<div class="top"><div class="wrap"><span>Care for every stage of life</span><span>For emergencies, contact your local emergency service.</span></div></div>
+<nav><div class="wrap navin"><a class="brand" href="#home"><span class="logo">✚</span>Medi<span>Care</span></a><div class="links"><a href="#services">Services</a><a href="#about">About</a><a href="#hours">Clinic hours</a><a class="btn" href="#appointment">Request an appointment</a></div></div></nav>
+<header class="hero" id="home"><div class="wrap hero-grid"><div><span class="eyebrow">Your health, our priority</span><h1>Thoughtful care.<br><em>Better tomorrows.</em></h1><p>A welcoming community healthcare experience built around clear communication, compassionate support, and care that puts people first.</p><div class="actions"><a class="btn" href="#appointment">Request an appointment →</a><a class="btn secondary" href="#services">Explore services</a></div><p class="note">Student demonstration website. No real appointments are booked and no patient information is stored.</p><div class="stats"><div class="stat"><strong>People first</strong>Compassionate approach</div><div class="stat"><strong>Clear guidance</strong>Easy-to-understand information</div><div class="stat"><strong>Community</strong>Care close to home</div></div></div><div class="visual" aria-label="Healthcare illustration"><div class="circle">🩺</div><div class="float f1">✦ Compassionate care</div><div class="float f2">♡ Your wellbeing matters</div></div></div></header>
+<section class="content" id="services"><div class="wrap"><div class="heading"><span class="eyebrow">How we can help</span><h2>Healthcare services for everyday wellbeing</h2><p>Explore example service categories in this classroom demo. Availability and services at a real clinic may differ.</p></div><div class="cards">
+<article class="card"><div class="ico">🩺</div><h3>General consultation</h3><p>A starting point for discussing common health concerns and understanding possible next steps with a qualified professional.</p><a href="#appointment">Request a visit →</a></article>
+<article class="card"><div class="ico">❤️</div><h3>Preventive health</h3><p>Learn about routine check-ups, healthy habits, and questions to raise during a healthcare visit.</p><a href="#appointment">Ask about check-ups →</a></article>
+<article class="card"><div class="ico">👨‍⚕️</div><h3>Follow-up support</h3><p>Plan questions and follow-up discussions so you can better understand care instructions from your provider.</p><a href="#appointment">Request follow-up →</a></article>
+</div></div></section>
+<section class="content about" id="about"><div class="wrap about-grid"><div class="about-art">🏥</div><div><span class="eyebrow">The MediCare approach</span><h2>Care should feel clear, respectful, and human.</h2><p style="color:var(--muted)">Our concept website demonstrates how a healthcare provider can communicate services and make it easier for visitors to find the information they need.</p><div class="checks"><div>Respect and empathy</div><div>Clear communication</div><div>Patient-first mindset</div><div>Accessible information</div></div><a class="btn" href="#appointment">Get in touch →</a></div></div></section>
+<section class="content" id="hours"><div class="wrap"><div class="heading"><span class="eyebrow">Plan your visit</span><h2>Clinic information</h2><p>Sample hours are shown for the project demonstration only.</p></div><div class="hours"><div class="hour"><strong>Monday – Friday</strong><span>9:00 AM – 5:00 PM (sample)</span></div><div class="hour"><strong>Saturday</strong><span>9:00 AM – 1:00 PM (sample)</span></div><div class="hour"><strong>Sunday & holidays</strong><span>Closed (sample)</span></div></div></div></section>
+<section class="content appointment" id="appointment"><div class="wrap"><div class="heading"><span class="eyebrow">Take the next step</span><h2>Request an appointment</h2><p>This is a front-end demonstration form only. Submissions are not sent to a clinic or saved.</p></div><div class="formbox"><form id="demoForm" class="formgrid"><div class="field"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required placeholder="Enter your name"></div><div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="service">Service of interest</label><select id="service" name="service" required><option value="">Choose a service</option><option>General consultation</option><option>Preventive health</option><option>Follow-up support</option></select></div><div class="field"><label for="date">Preferred date</label><input id="date" name="date" type="date" required></div><div class="field full"><label for="message">Message (optional)</label><textarea id="message" name="message" rows="3" placeholder="Share a general enquiry. Do not include sensitive medical information."></textarea></div><div class="field full"><button class="btn" type="submit">Preview request</button><p class="formhint">Demo only: do not enter real health details. This form does not create an appointment.</p><p id="formResult" role="status" aria-live="polite"></p></div></form></div></div></section>
+<footer><div class="wrap foot"><div><strong>MediCare</strong><br>Healthcare website · DevOps classroom project</div><div>Demo content only · Not a real medical provider<br>Version: <span id="version">Blue</span></div><div>Built for demonstrating Docker, Jenkins, Kubernetes and Blue-Green deployment.</div></div></footer>
+<div class="version">DEPLOYMENT: <span id="versionBadge">BLUE</span></div>
+<script>
+document.getElementById('demoForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('formResult').textContent='Demo preview created in this browser only. Nothing was sent or stored.';});
+const v=document.getElementById('version').textContent;document.getElementById('versionBadge').textContent=v.toUpperCase();
+</script>
+</body></html>
